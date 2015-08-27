@@ -1,0 +1,8 @@
+20aef10ef261aecf6ba054f12d65c79f *DESCRIPTION
+f2b4646d6ecd6777b9d5812306fe01b0 *NAMESPACE
+ac06148e7e78d5c17eaa78c88d63fc9f *R/CensMixReg.R
+5ddc586904d2d8ebe113d8f2543e9e39 *R/UtilityFunctions.R
+770a87fea5c5deec2add48b8bbc0dbe2 *data/wage.rates.txt.gz
+9acbea1572e243c46f8a80ee5e3b923f *man/CensMixReg-package.Rd
+cdab954f3dd7cc1fb5b75df24f8e013c *man/CensMixReg.Rd
+a551f128be5840004f488a0be8fbf757 *man/wage.rates.Rd

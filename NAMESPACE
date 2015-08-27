@@ -1,0 +1,4 @@
+export(CensMixReg)
+importFrom("stats","kmeans","dnorm","pnorm","dt","optimize","pt","var")
+importFrom("mixsmsn","rmix")
+
