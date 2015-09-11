@@ -141,9 +141,9 @@ CalMom <- function(mu,sigma2,nu,a,type)
 
 
 #To obtain the observed information matrix
-imm.fmcr = function(y,x1,cc, model)
+imm.fmcr = function(y,x1,cc,model)
 {
- if((class(model) != "T") && (class(model) != "Normal")) stop(paste("Family",class(model),"not recognized.",sep=" "))
+ #if((class(model) != "T") && (class(model) != "Normal")) stop(paste("Family",class(model),"not recognized.",sep=" "))
  n <- length(y)
  p <- ncol(x1)-1
  g <- length(model$pii)
@@ -200,11 +200,15 @@ imm.fmcr = function(y,x1,cc, model)
  si   <- matrix(0,n,7 + length(AbetasIMM)-2)
  for(i in 1:n)
  {
-  si[i,] <- c(Sibeta0[,i],Sibeta[,i],Sisigma[,i],Simu[,i],Sip[,i])
+  si[i,] <- c(Sibeta0[,i],Sibeta[,i],Simu[,i],Sisigma[,i],Sip[,i])
   Isum   <- Isum + cbind(si[i,])%*%si[i,]
  }
+
  return(list(IM=Isum,class=class(model)))
 }
+
+
+
 
 
 

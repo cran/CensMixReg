@@ -3,7 +3,7 @@
 \docType{package}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Modeling Censored Data Using Mixture Regression
+Censored linear mixture regression models
 }
 \description{
 Performs a Finite Mixture Censored (FM-CR) using using EM-type algorithm for iteratively computing maximum likelihood estimates of the parameters.
@@ -39,7 +39,7 @@ error = 0.00001, iter.max = 100, obs.prob= FALSE, kmeans.param = NULL)
 
 \item{group}{TRUE or FALSE.}
 
-\item{family}{"T":  fits a regression mixture for censured data or "Normal":  fits a Normal regression mixture censored data}
+\item{family}{"T":  fits a t-student regression mixture for censured data or "Normal":  fits a Normal regression mixture censored data}
 
 \item{error}{define the stopping criterion of the algorithm}
 

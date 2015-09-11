@@ -3,7 +3,7 @@
 \alias{CenMixReg}
 \docType{package}
 \title{
-Modeling Censored Data Using Mixture Regression
+Censored Linear Mixture Regression Models
 }
 \description{
 This package contains a principal function that performs to estimate estimate the parameters of a regression model considering an error that follows a finite mixture of Normal or Student-t distributions, using an analytically simple and efficient EM-type algorithm for iteratively computing maximum likelihood estimates of the parameters.
@@ -12,8 +12,8 @@ This package contains a principal function that performs to estimate estimate th
 \tabular{ll}{
 Package: \tab CensMixReg\cr
 Type: \tab Package\cr
-Version: \tab 0.5\cr
-Date: \tab 2015-08-26\cr
+Version: \tab 0.7\cr
+Date: \tab 2015-09-10\cr
 License: \tab GPL (>=2)\cr
 }
 }
