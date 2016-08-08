@@ -3,7 +3,7 @@
 #######                                    update in 2015-09-10                          ###############
 ########################################################################################################
 
-CensMixRegEM <- function(cc, y, x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu=NULL, pii = NULL, g = NULL, get.init = TRUE, criteria = TRUE, group = FALSE, family = "T", error = 0.00001, iter.max = 100, obs.prob= FALSE, kmeans.param = NULL)
+CensMixRegEM <- function(cc, y, x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu=NULL, pii = NULL, g = NULL, get.init = TRUE, criteria = TRUE, group = FALSE, family = "T", error = 0.00001, iter.max = 1000, obs.prob= FALSE, kmeans.param = NULL)
 {
 
   if(ncol(as.matrix(y)) > 1) stop("This function is only for univariate response y!")
@@ -43,9 +43,7 @@ CensMixRegEM <- function(cc, y, x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu
       medj   <- as.vector(init$centers)
       sigma2 <- init$withinss/init$size
       nu     <- 4
-    }
-
-    else{
+    }else{
       Abetas <- solve(t(x1)%*%x1)%*%t(x1)%*%y
       yr     <- y-x1%*%Abetas
       medj   <- mean(yr)
@@ -144,7 +142,7 @@ CensMixRegEM <- function(cc, y, x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu
         pii[which(pii == max(pii))] <- max(pii) - sum(pii[zero.pos])
       }
 
-      if (pii[1]< 0.5)
+      if (pii[1]< 0.5 && g==2)
       {
         # mu     <- cbind(mu[,2],mu[,1])
         # medj   <- as.vector(c(medj[2],medj[1]))
@@ -283,7 +281,7 @@ CensMixRegEM <- function(cc, y, x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu
       }
 
 
-      if (pii[1]< 0.5)
+      if (pii[1]< 0.5 && g==2)
       {
         # mu   <-cbind(mu[,2],mu[,1])
         # medj <- as.vector(c(medj[2],medj[1]))
@@ -375,7 +373,8 @@ CensMixRegEM <- function(cc, y, x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu
   namesrowAbetas <- c(); for(i in 1:length(Abetas)){namesrowAbetas[i] <- paste("beta",i-1,sep="")}
   namesrowMu     <- c(); for(i in 1:g){namesrowMu[i]<- paste("mu",i,sep="")}
   namesrowSigmas <- c(); for(i in 1:g){namesrowSigmas[i]<- paste("sigma",i,sep="")}
-  rownames(ttable) <- c(namesrowAbetas,namesrowMu,namesrowSigmas,"pii1","nu")
+
+  #rownames(ttable) <- c(namesrowAbetas,namesrowMu,namesrowSigmas,"pii1","nu")
   colnames(ttable) <- c("Estimate")
 
 

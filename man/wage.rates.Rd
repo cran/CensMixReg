@@ -7,6 +7,58 @@
 \usage{data(wage.rates)}
 \format{
 A data frame with 753 observed wage rates of married white women in 1975. Some wage rates are set equal to zero, this means that those wives did not work in 1975, therefore, these observations are considered left censored at zero.
+
+ \describe{
+    \item{inlf}{
+  =1 if in labor force, 1975
+    }
+    \item{hours}{
+ hours worked, 1975
+    }
+    \item{kidslt6}{
+ # kids < 6 years
+    }
+    \item{kidsge6}{
+# kids 6-18
+    }
+    \item{age}{
+ woman's age in yrs
+    }
+    \item{educ}{
+ years of schooling
+    }
+    \item{wage}{
+ estimated wage from earns., hours
+    }
+    \item{huseduc}{
+husband's years of schooling
+    }
+    \item{faminc}{
+  family income, 1975
+    }
+    \item{motheduc}{
+ mother's years of schooling
+    }
+    \item{fatheduc}{
+ father's years of schooling
+    }
+    \item{unem}{
+  unem. rate in county of resid.
+    }
+    \item{city}{
+  =1 if live in SMSA
+    }
+    \item{exper}{
+  actual labor mkt exper
+    }
+    \item{nwifeinc}{
+  (faminc - wage*hours)/1000
+    }
+    \item{expersq}{
+ exper^2
+    }
+ }
+
 }
 
 \encoding{latin1}
@@ -14,6 +66,7 @@ A data frame with 753 observed wage rates of married white women in 1975. Some w
 \source{
 Mroz, T.A. 1987. "The sensitivity of an empirical model of married women's hours of work to economic and statistical assumptions".
 }
+
 
 \examples{
 \dontrun{

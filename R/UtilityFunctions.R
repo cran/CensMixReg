@@ -143,69 +143,101 @@ CalMom <- function(mu,sigma2,nu,a,type)
 #To obtain the observed information matrix
 imm.fmcr = function(y,x1,cc,model)
 {
- #if((class(model) != "T") && (class(model) != "Normal")) stop(paste("Family",class(model),"not recognized.",sep=" "))
- n <- length(y)
- p <- ncol(x1)-1
- g <- length(model$pii)
+  #if((class(model) != "T") && (class(model) != "Normal")) stop(paste("Family",class(model),"not recognized.",sep=" "))
+  n           <- length(y)
+  p           <- ncol(x1)-1
+  g           <- length(model$res$pii)
 
- AbetasIMM <- model$Abetas
- medjIMM   <- model$medj
- sigma2IMM <- model$sigma2
- nuIMM     <- model$nu
- piiIMM    <- model$pii
+  Abetas      <- model$res$Abetas
+  medj        <- model$res$medj
+  sigma2      <- model$res$sigma2
+  nu          <- model$res$nu
+  pii         <- model$res$pii
 
- beta0IMM  <- AbetasIMM[1]
- betasIMM  <- as.matrix(AbetasIMM[2:(p+1)])   # parameters of regression dimension "p"
- varphi    <- rep(0,g) # beta0 + mu_j
- muIMM = mu1IMM <- matrix(0,n,g)
- x         <-  as.matrix(x1[,2:(p+1)])
+  beta0       <- Abetas[1]
+  betas       <- as.matrix(Abetas[2:(p+1)])   # parameters of regression dimension "p"
+  varphi      <- rep(0,g) # beta0 + mu_j
+  mu = mu1    <- matrix(0,n,g)
+  x           <- as.matrix(x1[,2:(p+1)])
 
- for (k in 1:g)
- {
-  varphi[k] <- beta0IMM+medjIMM[k]
-  mu1IMM[,k]<- x%*%betasIMM
-  muIMM[,k] <- mu1IMM[,k]+varphi[k]
- }
+  for (k in 1:g)
+  {
+    varphi[k] <- beta0+medj[k]
+    mu1[,k]   <- x%*%betas
+    mu[,k]    <- mu1[,k]+varphi[k]
+  }
 
- tal        <- matrix(0,n,g)
- Sibeta     <- matrix(0,p,n)
- Sibeta0    <- matrix(0,1,n)
- Simu       <- matrix(0,2,n)
- Sisigma    <- matrix(0,2,n)
+  tal         <- matrix(0,n,g)
+  Sibeta      <- matrix(0,p,n)
+  Sivarphi    <- matrix(0,2,n)
+  Sisigma     <- matrix(0,2,n)
+  Sip         <- matrix(0,g,n)
 
- for(j in 1:g)
- {
-  d        <- ((y-muIMM[,j])^2)/sigma2IMM[j]
-  u0       <- (nuIMM+1)/(nuIMM+d)
-  u1       <- y*(nuIMM+1)/(nuIMM+d)
-  u2       <- y^2*(nuIMM+1)/(nuIMM+d)
+  for(j in 1:g)
+  {
+    d            <- ((y-mu[,j])^2)/sigma2[j]
+    u0           <- (nu+1)/(nu+d)
+    u1           <- y*(nu+1)/(nu+d)
+    u2           <- y^2*(nu+1)/(nu+d)
 
-  d1       <- dT(cc, y, muIMM[,j], sigma2IMM[j],nuIMM)
-  d2       <- d.mixedT(cc, y, piiIMM, muIMM, sigma2IMM,nuIMM)
-  tal[,j]  <- d1*piiIMM[j]/d2
+    d1           <- dT(cc, y, mu[,j], sigma2[j],nu)
+    d2           <- d.mixedT(cc, y, pii, mu, sigma2,nu)
+    tal[,j]      <- d1*pii[j]/d2
 
-  Sibeta      <- Sibeta + t(x)%*%diag(tal[,j]*c(u1)/sigma2IMM[j]) - t(x)%*%diag(tal[,j]*c(u0)*(mu1IMM[,j] + varphi[j])/sigma2IMM[j])
-  Sibeta0     <- Sibeta0 + (1/sigma2IMM[j])*tal[,j]*c(u1) - tal[,j]*c(u0)*(mu1IMM[,j] + varphi[j])
-  Simu[j,]    <- (1/sigma2IMM[j])*(tal[,j]*c(u1) - tal[,j]*c(u0)*(mu1IMM[,j] + varphi[j]))
-  Sisigma[j,] <- -0.5*(1/sigma2IMM[j]^2)*tal[,j]*(sigma2IMM[j] - c(u2) + 2*c(u1)*(mu1IMM[,j] + varphi[j]) - c(u0)*(mu1IMM[,j] + varphi[j])^2)
- }
+    Sibeta       <- Sibeta + t(x)%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x)%*%diag(tal[,j]*c(u0)*(mu1[,j] + varphi[j])/sigma2[j])
+    Sip[j,]      <- (1/pii[j])*tal[,j] - (1/pii[g])*tal[,g]
+    Sivarphi[j,] <- (1/sigma2[j])*(tal[,j]*c(u1) - tal[,j]*c(u0)*(mu1[,j] + varphi[j]))
+    Sisigma[j,]  <- -0.5*(1/sigma2[j]^2)*tal[,j]*(sigma2[j] - c(u2) + 2*c(u1)*(mu1[,j] + varphi[j]) - c(u0)*(mu1[,j] + varphi[j])^2)
+  }
 
- Sip <- matrix(0,1,n)
- for(j in 1:(g-1))
-   Sip[j,] <- (1/piiIMM[j])*tal[,j]
- Sip <- Sip - 1
+  soma      <- matrix(0, (length(Abetas) -1) + 3*g -1, (length(Abetas) -1) + 3*g -1)
+  si        <- matrix(0, n, (length(Abetas) -1) + 3*g -1)
 
+  for(i in 1:n)
+  {
+    si[i,]  <- c(Sibeta[,i],Sip[1:(g-1),i],Sivarphi[,i],Sisigma[,i])
+    soma    <- soma + cbind(si[i,])%*%si[i,]
+  }
 
- Isum <- matrix(0,7 + length(AbetasIMM)-2,7 + length(AbetasIMM)-2)
- si   <- matrix(0,n,7 + length(AbetasIMM)-2)
- for(i in 1:n)
- {
-  si[i,] <- c(Sibeta0[,i],Sibeta[,i],Simu[,i],Sisigma[,i],Sip[,i])
-  Isum   <- Isum + cbind(si[i,])%*%si[i,]
- }
+  #Jacobian
 
- return(list(IM=Isum,class=class(model)))
+  p      <- length(betas)
+  j11    <- diag(rep(1,p))
+  j12    <- matrix(0, nrow=p, ncol=g-1)
+  j13    <- matrix(0, nrow=p, ncol=1)
+  j14    <- matrix(0, nrow=p, ncol=g)
+  j15    <- matrix(0, nrow=p, ncol=g)
+  J1     <- cbind(j11,j12,j13,j14,j15)
+
+  j21    <- matrix(0, nrow=g-1, ncol=p)
+  j22    <- diag(rep(1,g-1))
+  j23    <- matrix(0, nrow=g-1, ncol=1)
+  j24    <- -as.matrix((medj[1:(g-1)] - medj[g])^(-1))%*%t(as.matrix(pii))
+  j24    <- matrix(j24,ncol=g,nrow=g-1)
+  j25    <- matrix(0, nrow=g-1, ncol=g)
+  J2     <- cbind(j21,j22,j23,j24,j25)
+
+  j31    <- matrix(0, nrow=g, ncol=p)
+  j32    <- matrix(0, nrow=g, ncol=g-1)
+  j33    <- matrix(1, nrow=g, ncol=1)
+  j34    <- diag(rep(1,g))
+  j35    <- matrix(0, nrow=g, ncol=g)
+  J3     <- cbind(j31,j32,j33,j34,j35)
+
+  j41    <- matrix(0, nrow=g, ncol=p)
+  j42    <- matrix(0, nrow=g, ncol=g-1)
+  j43    <- matrix(0, nrow=g, ncol=1)
+  j44    <- matrix(0, nrow=g, ncol=g)
+  j45    <- diag(rep(1,g))
+  J4     <- cbind(j41,j42,j43,j44,j45)
+
+  Jacobian       <- rbind(J1,J2,J3,J4)
+  IM             <- t(Jacobian)%*%solve(soma)%*%Jacobian
+  EP             <- as.matrix(sqrt(diag(t(Jacobian)%*%solve(soma)%*%Jacobian)))
+
+  return(list(IM=IM,class=class(model),EP=EP))
 }
+
 
 
 
