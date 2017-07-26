@@ -32,20 +32,13 @@ p  <- 5
 y  <- as.matrix(concentration[,1:p])
 cc <- as.matrix(concentration[,(p+1):(2*p)])
 
-fitT <- CensMmix(cc, y, nu=3, mu=NULL, Sigma = NULL,  pii = NULL, g = 2,
-                  get.init = TRUE, criteria = TRUE, group = TRUE,
-                  family = "t", error = 0.00001, iter.max = 350,
-                  uni.Sigma = TRUE, obs.prob= FALSE, kmeans.param = NULL)
-
 fitN <- CensMmix(cc, y, nu=3, mu=NULL, Sigma = NULL,  pii = NULL, g = 2,
                   get.init = TRUE, criteria = TRUE, group = TRUE,
                   family = "Normal", error = 0.00001, iter.max = 350,
                   uni.Sigma = TRUE, obs.prob= FALSE, kmeans.param = NULL)
 
 #Standard error (SE)
-fitT$res$SE
 fitN$res$SE
-
 }
 }
 \keyword{datasets}

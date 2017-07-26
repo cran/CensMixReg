@@ -6,15 +6,15 @@
 Censored Linear Mixture Regression Models
 }
 \description{
-This package contains a principal function that performs to estimate the parameters of a regression model considering an error that follows a finite mixture of Normal or Student-t distributions, using an analytically simple and efficient EM-type algorithm for iteratively computing maximum likelihood estimates of the parameters. Also contains a function for estimate
+This package contains a principal function that performs to estimate the parameters of a regression model considering an error that follows a finite mixture of Scale mixture of normal distributions, using an analytically simple and efficient EM-type algorithm for iteratively computing maximum likelihood estimates of the parameters. Also contains a function for estimate
 the parameters of a censored linear models of finite mixture multivariate Student-t and Normal distributions.
 }
 \details{
 \tabular{ll}{
 Package: \tab CensMixReg\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2016-08-06\cr
+Version: \tab 1.5\cr
+Date: \tab 2017-07-26\cr
 License: \tab GPL (>=2)\cr
 }
 }
@@ -29,6 +29,8 @@ Maintainer: Luis Benites Sanchez \email{lbenitesanchez@gmail.com}
 \references{
 Benites, L., Lachos, V.H., Cabral, C.R.B. (2015). Robust Regression Modeling for Censored Data Based on Mixtures of Student-t Distributions. Technical Report 5, Universidade Estadual de Campinas. \url{http://www.ime.unicamp.br/sites/default/files/rp05-15.pdf}
 
+Benites, L., Lachos, V.H., H. Bolfarine (2017). Robust Regression Modeling of Censored Databased on Mixtures of Scale Mixtures of Normal Distributions. Technical Report 1, University of Connecticut.
+
 Karlsson, M. & Laitila, T. (2014). Finite mixture modeling of censored regression models. Statistical papers, 55(3), 627-642.
 
 Massuia, M. B., Cabral, C. R. B., Matos, L. A. & Lachos, V. H. (2014). Influence diagnostics for student-t censored linear regression models. Statistics, (ahead-of-print), 1-21.
@@ -41,7 +43,7 @@ Garay, A. M., Lachos, V. H., Bolfarine, H. & Cabral, C. R. (2015). Linear censor
 \keyword{package}
 
 \seealso{
-\code{\link{CensMixReg}}
+\code{\link{fm.smn.cr}}
 }
 
 \examples{

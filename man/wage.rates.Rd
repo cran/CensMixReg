@@ -69,9 +69,8 @@ Mroz, T.A. 1987. "The sensitivity of an empirical model of married women's hours
 
 
 \examples{
-\dontrun{
+
 ##Load the data
- library(CensRegMod)
  data(wage.rates)
 
 ##Set the response y and covariate x
@@ -82,61 +81,18 @@ Mroz, T.A. 1987. "The sensitivity of an empirical model of married women's hours
  cc   <- c(rep(0,428),rep(1,325))
 
 ##Fits a left mixture censored Student-t model to the data
- fitT <- CensMixReg(cc, -y, -x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu=NULL, pii = NULL,
- g = 2, get.init = TRUE, criteria = TRUE,  group = FALSE, family = "T", error = 0.00001,
- iter.max = 500, obs.prob= FALSE, kmeans.param = NULL)
+ initial    <- initial.values.fm.smn.cr(cc, y,x1,g=2,algorithm="k-means"
+ ,family="T",lower=1,upper=20,space=1,plotLog = TRUE,searchNU=TRUE,
+ printNU=FALSE, saveFigure = FALSE)
 
- #########################################
- #A simple output example
-
- ---------------------------------------------------------
-           Censored linear mixture regression model
----------------------------------------------------------
-
-Observations = 753
------------
-Estimates
------------
-
-        Estimate
-beta0    5.69541
-beta1   -0.00958
-beta2    0.41823
-beta3    2.87485
-mu1      0.18454
-mu2    -22.24469
-sigma1   3.80318
-sigma2   8.51759
-pii1     0.99177
-nu       3.17652
-------------------------
-Model selection criteria
-------------------------
-
-         Loglik      AIC      BIC      EDC
-Value -1239.528 2499.057 2545.298 2533.939
--------
-Details
--------
-
-Iterations = 482
-Processing time = 1.009154 mins
-
-
+ fitT <- fm.smn.cr(cc, y, x1, Abetas = initial$Abetas, medj = initial$medj
+ , sigma2 = initial$sigma2, pii = initial$pii, nu=initial$nu, g = 2,
+ family = "T", error = 0.00001, iter.max = 500)
 
 ##Fits a left mixture censored Normal model to the data
- fitN <- CensMixReg(cc, -y, -x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu=NULL, pii = NULL,
- g = 2, get.init = TRUE, criteria = TRUE, group = FALSE, family = "Normal", error = 0.00001,
- iter.max = 500, obs.prob= FALSE, kmeans.param = NULL)
-
-#Standard error (SE) when random errors follow a finite mixture of Student-t distributions.
- IFmixRegT <- imm.fmcr(y,x1,cc, fitT)
- SEmixT    <- sqrt(diag(solve(IFmixRegT$IM)))
-
-#Standard error when random errors follow a finite mixture of normal distributions.
- IFmixRegN <- imm.fmcr(y,x1,cc, fitN)
- SEmixN    <- sqrt(diag(solve(IFmixRegN$IM)))
- }
+ fitN <- fm.smn.cr(cc, y, x1, Abetas = initial$Abetas, medj = initial$medj
+ , sigma2 = initial$sigma2, pii = initial$pii, nu=initial$nu, g = 2,
+ family = "Normal", error = 0.00001, iter.max = 500)
 }
 
 

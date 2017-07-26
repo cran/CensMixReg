@@ -1,5 +1,5 @@
-\name{CensMixReg}
-\alias{CensMixReg}
+\name{fm.smn.cr}
+\alias{fm.smn.cr}
 \docType{package}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -9,9 +9,8 @@ Censored linear mixture regression models
 Performs a Finite Mixture Censored (FM-CR) using using EM-type algorithm for iteratively computing maximum likelihood estimates of the parameters.
 }
 \usage{
-CensMixReg(cc, y, x1, Abetas = NULL, medj= NULL, sigma2 = NULL, nu=NULL, pii = NULL,
-g = NULL, get.init = TRUE, criteria = TRUE, group = FALSE, family = "T",
-error = 0.00001, iter.max = 100, obs.prob= FALSE, kmeans.param = NULL)
+fm.smn.cr(cc, y, x1, Abetas = NULL, medj = NULL, sigma2 = NULL, pii = NULL,
+nu=NULL, g = NULL, family = "Normal", error = 0.00001, iter.max = 100, aitken = TRUE)
 }
 
 \arguments{
@@ -33,21 +32,13 @@ error = 0.00001, iter.max = 100, obs.prob= FALSE, kmeans.param = NULL)
 
 \item{g}{Numbers of components}
 
-\item{get.init}{TRUE or FALSE. It indicates if the program (TRUE) is get the initial values or if the user (FALSE) entered manually the initial values.}
-
-\item{criteria}{It indicates if are calculated the criterion selection methods (AIC, BIC, EDC and ICL)}
-
-\item{group}{TRUE or FALSE.}
-
-\item{family}{"T":  fits a t-student regression mixture for censured data or "Normal":  fits a Normal regression mixture censored data}
+\item{family}{"T":  fits a t-student regression mixture for censured data or "Normal":  fits a Normal regression mixture censored data or "Slash": fits a Slash regression mixture censored data}
 
 \item{error}{define the stopping criterion of the algorithm}
 
 \item{iter.max}{the maximum number of iterations of the EM algorithm}
 
-\item{obs.prob}{TRUE or FALSE.}
-
-\item{kmeans.param}{Parameters for the k-means clustering algorithm}
+\item{aitken}{Aitken acceleration: TRUE or FALSE.}
 
 }
 
@@ -86,7 +77,7 @@ Basford, K., Greenway, D.,McLachlan,G. & Peel,D. (1997). Standard errors of fitt
 \keyword{package}
 
 \seealso{
-\code{\link{CensMixReg}},\code{\link{wage.rates}}
+\code{\link{fm.smn.cr}},\code{\link{wage.rates}}
 }
 
 \examples{
