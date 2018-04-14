@@ -310,6 +310,8 @@ initial.values.fmr.smn.cr <- function(cc, y,x,g=2,algorithm="k-medoids",family="
           plot(nu[,1],nu[,2],type="n",ylab=expression(paste(gamma)),xlab=expression(paste(nu)),ylim=c(0,1.2))
           abline(v=nu1,lty=2)
           abline(h=nu2,lty=2)
+          #eq <- bquote(bold(nu[max] == .(nu0)),bold(nu[max] == .(nu0)))
+          #mtext(eq,side=3,cex=1.5)
           legend('topleft',legend= c(as.expression(bquote(nu[max] == .(nu1))), as.expression(bquote(gamma[max] == .(nu2)))),bty="n",cex=1.5)
           dev.off() #Fechando o dispositivo potscript
       }
@@ -811,10 +813,7 @@ CensEsperUY1 <- function(mu,sigma2,nu,delta,Lim1,Lim2,type=type,cens=cens)
 #e tambem e considerando xij
 im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
 {
-  if((family != "T") && (family != "Normal")  && (family != "Slash") && (family != "NormalC")) stop('paste'("Family",family,"not recognized.",sep=" "))
-
-  #%-----------------------------------------------------------------------------------------------------------%
-  #%-----------------------------------------------------------------------------------------------------------%
+  if((family != "T") && (family != "Normal")  && (family != "Slash") && (family != "NormalC")) stop(paste("Family",family,"not recognized.",sep=" "))
 
   if(family=="Normal")
   {
@@ -822,20 +821,22 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
 
     Lim1          <- y #Esta sendo considerado o censura tipo 2
     Lim2          <- rep(Inf,n)
+
+    p             <- ncol(x)
     g             <- length(pii)
 
-    p    <- c()
-    for(j in 1:g) {p[j]    <- ncol(x[[j]])}
+    Abetas        <- Abetas
+    sigma2        <- sigma2
+    pii           <- pii
 
     mu            <- matrix(0,n,g)
 
-    for (k in 1:g){mu[,k] <- x[[k]]%*%Abetas[[k]]}
+    for (k in 1:g){mu[,k] <- x%*%Abetas[,k]}
 
     tal           <- matrix(0,n,g)
+    Sibeta        <- rep(list(matrix(0,p,n)),2)
     Sisigma       <- matrix(0,g,n)
     Sip           <- matrix(0,g,n)
-    Sibeta        <- list()
-    for(j in 1:g){Sibeta[[j]]  <- matrix(0,nrow=p[j],ncol=n)}
 
     for(j in 1:g)
     {
@@ -853,16 +854,16 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
       d2          <- d.mixedN(cc, y, pii, mu, sigma2)
       tal[,j]     <- d1*pii[j]/d2
 
-      Sibeta[[j]] <- Sibeta[[j]] + t(x[[j]])%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x[[j]])%*%diag(tal[,j]*c(u0)*mu[,j]/sigma2[j])
+      Sibeta[[j]] <- Sibeta[[j]] + t(x)%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x)%*%diag(tal[,j]*c(u0)*mu[,j]/sigma2[j])
       Sip[j,]     <- (1/pii[j])*tal[,j] - (1/pii[g])*tal[,g]
       Sisigma[j,] <- -0.5*(1/sigma2[j]^2)*tal[,j]*(sigma2[j] - c(u2) + 2*c(u1)*mu[,j] - c(u0)*mu[,j]^2)
     }
 
+    soma          <- matrix(0, g*nrow(Abetas)  + 2*g - 1, g*nrow(Abetas)  + 2*g - 1)
+    si            <- matrix(0, n, g*nrow(Abetas)  + 2*g - 1)
+
     if(g==1)
     {
-      soma          <- matrix(0, g*nrow(Abetas[[1]])  + 2*g - 1, g*nrow(Abetas[[1]])  + 2*g - 1)
-      si            <- matrix(0, n, g*nrow(Abetas[[1]])  + 2*g - 1)
-
       for(i in 1:n)
       {
         si[i,]    <- c(Sibeta[[1]][,i],Sip[1:(g-1),i],Sisigma[,i])
@@ -872,9 +873,6 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
 
     if(g==2)
     {
-      soma        <- matrix(0, nrow(Abetas[[1]]) + nrow(Abetas[[2]])  + 2*g - 1, (nrow(Abetas[[1]]) + nrow(Abetas[[2]]))  + 2*g - 1)
-      si          <- matrix(0, n, nrow(Abetas[[1]]) + nrow(Abetas[[2]])  + 2*g - 1)
-
       for(i in 1:n)
       {
         si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sip[1:(g-1),i],Sisigma[,i])
@@ -906,7 +904,6 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
 
   #%-----------------------------------------------------------------------------------------------------------%
   #%-----------------------------------------------------------------------------------------------------------%
-
   if(family=="T")
   {
     n             <- length(y)
@@ -914,20 +911,22 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
     Lim1          <- y #Esta sendo considerado o censura tipo 2
     Lim2          <- rep(Inf,n)
 
+    p             <- ncol(x)
     g             <- length(pii)
 
-    p             <- c()
-    for(j in 1:g) {p[j]    <- ncol(x[[j]])}
+    Abetas        <- Abetas
+    sigma2        <- sigma2
+    pii           <- pii
+    nu            <- nu
 
     mu            <- matrix(0,n,g)
 
-    for (k in 1:g){mu[,k] <- x[[k]]%*%Abetas[[k]]}
+    for (k in 1:g){mu[,k] <- x%*%Abetas[,k]}
 
     tal           <- matrix(0,n,g)
+    Sibeta        <- rep(list(matrix(0,p,n)),2)
     Sisigma       <- matrix(0,g,n)
     Sip           <- matrix(0,g,n)
-    Sibeta        <- list()
-    for(j in 1:g){Sibeta[[j]]  <- matrix(0,nrow=p[j],ncol=n)}
 
     for(j in 1:g)
     {
@@ -945,13 +944,13 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
       d2          <- d.mixedT(cc, y, pii, mu, sigma2,nu)
       tal[,j]     <- d1*pii[j]/d2
 
-      Sibeta[[j]] <- Sibeta[[j]] + t(x[[j]])%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x[[j]])%*%diag(tal[,j]*c(u0)*mu[,j]/sigma2[j])
+      Sibeta[[j]] <- Sibeta[[j]] + t(x)%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x)%*%diag(tal[,j]*c(u0)*mu[,j]/sigma2[j])
       Sip[j,]     <- (1/pii[j])*tal[,j] - (1/pii[g])*tal[,g]
       Sisigma[j,] <- -0.5*(1/sigma2[j]^2)*tal[,j]*(sigma2[j] - c(u2) + 2*c(u1)*mu[,j] - c(u0)*mu[,j]^2)
     }
 
-    #soma          <- matrix(0, g*nrow(Abetas)  + 2*g - 1, g*nrow(Abetas)  + 2*g - 1)
-    #si            <- matrix(0, n, g*nrow(Abetas)  + 2*g - 1)
+    soma          <- matrix(0, g*nrow(Abetas)  + 2*g - 1, g*nrow(Abetas)  + 2*g - 1)
+    si            <- matrix(0, n, g*nrow(Abetas)  + 2*g - 1)
 
     if(g==1)
     {
@@ -964,9 +963,6 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
 
     if(g==2)
     {
-      soma        <- matrix(0, nrow(Abetas[[1]]) + nrow(Abetas[[2]])  + 2*g - 1, (nrow(Abetas[[1]]) + nrow(Abetas[[2]]))  + 2*g - 1)
-      si          <- matrix(0, n, nrow(Abetas[[1]]) + nrow(Abetas[[2]])  + 2*g - 1)
-
       for(i in 1:n)
       {
         si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sip[1:(g-1),i],Sisigma[,i])
@@ -998,117 +994,29 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
 
   #%-----------------------------------------------------------------------------------------------------------%
   #%-----------------------------------------------------------------------------------------------------------%
-
-  if(family=="NormalC")
+  if(family=="Slash")
   {
     n             <- length(y)
 
     Lim1          <- y #Esta sendo considerado o censura tipo 2
     Lim2          <- rep(Inf,n)
 
+    p             <- ncol(x)
     g             <- length(pii)
 
-    p             <- c()
-    for(j in 1:g) {p[j]    <- ncol(x[[j]])}
+    Abetas        <- Abetas
+    sigma2        <- sigma2
+    pii           <- pii
+    nu            <- nu
 
     mu            <- matrix(0,n,g)
 
-    for (k in 1:g){mu[,k] <- x[[k]]%*%Abetas[[k]]}
+    for (k in 1:g){mu[,k] <- x%*%Abetas[,k]}
 
     tal           <- matrix(0,n,g)
+    Sibeta        <- rep(list(matrix(0,p,n)),2)
     Sisigma       <- matrix(0,g,n)
     Sip           <- matrix(0,g,n)
-    Sibeta        <- list()
-    for(j in 1:g){Sibeta[[j]]  <- matrix(0,nrow=p[j],ncol=n)}
-
-    for(j in 1:g)
-    {
-      NCensEUY    <- NCensurEsperUY(y,mu[,j],sigma2[j],nu=nu,0,type="NormalC")
-      u0          <- NCensEUY$EUY0
-      u1          <- NCensEUY$EUY1
-      u2          <- NCensEUY$EUY2
-
-      CensEUY     <- CensEsperUY1(mu[cc==1,j],sigma2=sigma2[j],nu=nu,delta=0,Lim1=Lim1[cc==1],Lim2=Lim2[cc==1],type="NormalC", cens="2")
-      u0[cc==1]   <- CensEUY$EUY0
-      u1[cc==1]   <- CensEUY$EUY1
-      u2[cc==1]   <- CensEUY$EUY2
-
-      d1          <- dNormal(cc, y, mu[,j], sigma2[j])
-      d2          <- d.mixedN(cc, y, pii, mu, sigma2)
-      tal[,j]     <- d1*pii[j]/d2
-
-      Sibeta[[j]] <- Sibeta[[j]] + t(x[[j]])%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x[[j]])%*%diag(tal[,j]*c(u0)*mu[,j]/sigma2[j])
-      Sip[j,]     <- (1/pii[j])*tal[,j] - (1/pii[g])*tal[,g]
-      Sisigma[j,] <- -0.5*(1/sigma2[j]^2)*tal[,j]*(sigma2[j] - c(u2) + 2*c(u1)*mu[,j] - c(u0)*mu[,j]^2)
-    }
-
-    if(g==1)
-    {
-      for(i in 1:n)
-      {
-        si[i,]    <- c(Sibeta[[1]][,i],Sip[1:(g-1),i],Sisigma[,i])
-        soma      <- soma + cbind(si[i,])%*%si[i,]
-      }
-    }
-
-    if(g==2)
-    {
-      soma        <- matrix(0, nrow(Abetas[[1]]) + nrow(Abetas[[2]])  + 2*g - 1, (nrow(Abetas[[1]]) + nrow(Abetas[[2]]))  + 2*g - 1)
-      si          <- matrix(0, n, nrow(Abetas[[1]]) + nrow(Abetas[[2]])  + 2*g - 1)
-
-      for(i in 1:n)
-      {
-        si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sip[1:(g-1),i],Sisigma[,i])
-        soma      <- soma + cbind(si[i,])%*%si[i,]
-      }
-    }
-
-    if(g==3)
-    {
-      for(i in 1:n)
-      {
-        si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sibeta[[3]][,i],Sip[1:(g-1),i],Sisigma[,i])
-        soma      <- soma + cbind(si[i,])%*%si[i,]
-      }
-    }
-
-    if(g==4)
-    {
-      for(i in 1:n)
-      {
-        si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sibeta[[3]][,i],Sibeta[[4]][,i],Sip[1:(g-1),i],Sisigma[,i])
-        soma      <- soma + cbind(si[i,])%*%si[i,]
-      }
-    }
-
-    IM            <- solve(soma)
-    EP            <- as.matrix(sqrt(diag(IM)))
-  }
-
-  #%-----------------------------------------------------------------------------------------------------------%
-  #%-----------------------------------------------------------------------------------------------------------%
-
-  if(family =="Slash")
-  {
-    n             <- length(y)
-
-    Lim1          <- y #Esta sendo considerado o censura tipo 2
-    Lim2          <- rep(Inf,n)
-
-    g             <- length(pii)
-
-    p             <- c()
-    for(j in 1:g) {p[j]    <- ncol(x[[j]])}
-
-    mu            <- matrix(0,n,g)
-
-    for (k in 1:g){mu[,k] <- x[[k]]%*%Abetas[[k]]}
-
-    tal           <- matrix(0,n,g)
-    Sisigma       <- matrix(0,g,n)
-    Sip           <- matrix(0,g,n)
-    Sibeta        <- list()
-    for(j in 1:g){Sibeta[[j]]  <- matrix(0,nrow=p[j],ncol=n)}
 
     for(j in 1:g)
     {
@@ -1122,17 +1030,17 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
       u1[cc==1]   <- CensEUY$EUY1
       u2[cc==1]   <- CensEUY$EUY2
 
-      d1          <- dT(cc, y, mu[,j], sigma2[j],nu)
-      d2          <- d.mixedT(cc, y, pii, mu, sigma2,nu)
+      d1          <- dSL(cc, y, mu[,j], sigma2[j],nu)
+      d2          <- d.mixedSL(cc, y, pii, mu, sigma2,nu)
       tal[,j]     <- d1*pii[j]/d2
 
-      Sibeta[[j]] <- Sibeta[[j]] + t(x[[j]])%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x[[j]])%*%diag(tal[,j]*c(u0)*mu[,j]/sigma2[j])
+      Sibeta[[j]] <- Sibeta[[j]] + t(x)%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x)%*%diag(tal[,j]*c(u0)*mu[,j]/sigma2[j])
       Sip[j,]     <- (1/pii[j])*tal[,j] - (1/pii[g])*tal[,g]
       Sisigma[j,] <- -0.5*(1/sigma2[j]^2)*tal[,j]*(sigma2[j] - c(u2) + 2*c(u1)*mu[,j] - c(u0)*mu[,j]^2)
     }
 
-    #soma          <- matrix(0, g*nrow(Abetas)  + 2*g - 1, g*nrow(Abetas)  + 2*g - 1)
-    #si            <- matrix(0, n, g*nrow(Abetas)  + 2*g - 1)
+    soma          <- matrix(0, g*nrow(Abetas)  + 2*g - 1, g*nrow(Abetas)  + 2*g - 1)
+    si            <- matrix(0, n, g*nrow(Abetas)  + 2*g - 1)
 
     if(g==1)
     {
@@ -1145,9 +1053,96 @@ im.fmr.smn.cr = function(cc, y,x,Abetas,sigma2,pii,nu,family)
 
     if(g==2)
     {
-      soma        <- matrix(0, nrow(Abetas[[1]]) + nrow(Abetas[[2]])  + 2*g - 1, (nrow(Abetas[[1]]) + nrow(Abetas[[2]]))  + 2*g - 1)
-      si          <- matrix(0, n, nrow(Abetas[[1]]) + nrow(Abetas[[2]])  + 2*g - 1)
+      for(i in 1:n)
+      {
+        si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sip[1:(g-1),i],Sisigma[,i])
+        soma      <- soma + cbind(si[i,])%*%si[i,]
+      }
+    }
 
+    if(g==3)
+    {
+      for(i in 1:n)
+      {
+        si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sibeta[[3]][,i],Sip[1:(g-1),i],Sisigma[,i])
+        soma      <- soma + cbind(si[i,])%*%si[i,]
+      }
+    }
+
+    if(g==4)
+    {
+      for(i in 1:n)
+      {
+        si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sibeta[[3]][,i],Sibeta[[4]][,i],Sip[1:(g-1),i],Sisigma[,i])
+        soma      <- soma + cbind(si[i,])%*%si[i,]
+      }
+    }
+
+    IM            <- solve(soma)
+    EP            <- as.matrix(sqrt(diag(IM)))
+  }
+
+  #%-----------------------------------------------------------------------------------------------------------%
+  #%-----------------------------------------------------------------------------------------------------------%
+  if(family=="NormalC")
+  {
+    n             <- length(y)
+
+    Lim1          <- y #Esta sendo considerado o censura tipo 2
+    Lim2          <- rep(Inf,n)
+
+    p             <- ncol(x)
+    g             <- length(pii)
+
+    Abetas        <- Abetas
+    sigma2        <- sigma2
+    pii           <- pii
+    nu            <- nu
+
+    mu            <- matrix(0,n,g)
+
+    for (k in 1:g){mu[,k] <- x%*%Abetas[,k]}
+
+    tal           <- matrix(0,n,g)
+    Sibeta        <- rep(list(matrix(0,p,n)),2)
+    Sisigma       <- matrix(0,g,n)
+    Sip           <- matrix(0,g,n)
+
+    for(j in 1:g)
+    {
+      NCensEUY    <- NCensurEsperUY(y,mu[,j],sigma2[j],nu=nu,0,type="NormalC")
+      u0          <- NCensEUY$EUY0
+      u1          <- NCensEUY$EUY1
+      u2          <- NCensEUY$EUY2
+
+      CensEUY     <- CensEsperUY1(mu[cc==1,j],sigma2=sigma2[j],nu=nu,delta=0,Lim1=Lim1[cc==1],Lim2=Lim2[cc==1],type="NormalC", cens="2")
+      u0[cc==1]   <- CensEUY$EUY0
+      u1[cc==1]   <- CensEUY$EUY1
+      u2[cc==1]   <- CensEUY$EUY2
+
+      d1          <- dCN(cc, y, mu[,j], sigma2[j],nu)
+      d2          <- d.mixedCN(cc, y, pii, mu, sigma2,nu)
+      tal[,j]     <- d1*pii[j]/d2
+
+      Sibeta[[j]] <- Sibeta[[j]] + t(x)%*%diag(tal[,j]*c(u1)/sigma2[j]) - t(x)%*%diag(tal[,j]*c(u0)*mu[,j]/sigma2[j])
+      Sip[j,]     <- (1/pii[j])*tal[,j] - (1/pii[g])*tal[,g]
+      Sisigma[j,] <- -0.5*(1/sigma2[j]^2)*tal[,j]*(sigma2[j] - c(u2) + 2*c(u1)*mu[,j] - c(u0)*mu[,j]^2)
+    }
+
+    soma          <- matrix(0, g*nrow(Abetas)  + 2*g - 1, g*nrow(Abetas)  + 2*g - 1)
+    si            <- matrix(0, n, g*nrow(Abetas)  + 2*g - 1)
+
+    if(g==1)
+    {
+      for(i in 1:n)
+      {
+        si[i,]    <- c(Sibeta[[1]][,i],Sip[1:(g-1),i],Sisigma[,i])
+        soma      <- soma + cbind(si[i,])%*%si[i,]
+      }
+    }
+
+    if(g==2)
+    {
       for(i in 1:n)
       {
         si[i,]    <- c(Sibeta[[1]][,i],Sibeta[[2]][,i],Sip[1:(g-1),i],Sisigma[,i])

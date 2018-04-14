@@ -1,4 +1,5 @@
-export(fm.smn.cr,imm.fm.smn.cr,initial.values.fm.smn.cr,initial.values.fmr.smn.cr)
+export(fm.smn.cr,imm.fm.smn.cr,initial.values.fm.smn.cr)
+export(fmr.smn.cr,initial.values.fmr.smn.cr)
 export(CensMmix,rmmixcr)
 importFrom("stats","kmeans","dnorm","pnorm","dt","optimize","pt","var","rmultinom","runif","rnorm","rgamma", "integrate", "optim", "rbeta")
 importFrom("mixsmsn","rmix")

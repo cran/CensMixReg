@@ -29,7 +29,7 @@ fmr.smn.cr <- function(cc, y, x, Abetas = NULL, sigma2 = NULL, pii = NULL, nu=NU
   cat('Details\n')
   cat('-------\n')
   cat('\n')
-  cat("Class =",class(out))
+  cat("Family =",class(out))
   cat('\n')
   cat('Iterations =',out$iter)
   cat('\n')
